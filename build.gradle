@@ -1,0 +1,110 @@
+def javaHome = System.properties['java.home']
+def javaFxJar = "${javaHome}/lib/jfxrt.jar"
+def antJavaFxJar = "${javaHome}/../lib/ant-javafx.jar"
+
+allprojects {
+    version '0.1'
+    if (System.env.BUILD_NUMBER) {
+        version "${version}-b${System.env.BUILD_NUMBER}"
+    }
+}
+
+import groovy.xml.NamespaceBuilder
+import org.apache.tools.ant.filters.ReplaceTokens
+
+
+subprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+        maven {
+            url 'http://artifacts.openmicroscopy.org/artifactory/ome.releases/'
+        }
+        maven {
+            url 'http://artifacts.openmicroscopy.org/artifactory/ome.snapshots/'
+        }
+        maven {
+            url 'http://artifacts.openmicroscopy.org/artifactory/ome.external/'
+        }
+        maven {
+            url 'https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases/'
+        }
+        maven {
+            url 'https://artifacts.glencoesoftware.com/artifactory/libs-local/'
+        }
+    }
+
+    dependencies {
+        compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.1'
+        compile group: 'ch.qos.logback', name: 'logback-core', version: '1.1.1'
+        testCompile group: 'org.testng', name: 'testng', version: '6.8'
+    }
+
+    test {
+        useTestNG()
+    }
+}
+
+project (':big-image-viewer-javafx') {
+    apply plugin: 'application'
+
+    mainClassName = 'org.openmicroscopy.viewer.ImageViewer'
+    def applicationClassName = 'org.openmicroscopy.viewer.ImageViewer'
+    def javaOpts = [
+        '-Dlogback.configurationFile=logback-big-image-viewer-javafx.xml',
+    ]
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        flatDir {
+            dirs 'lib'
+        }
+    }
+
+    dependencies {
+        compile group: 'ome', name: 'formats-gpl', version: '6.0.0-m4'
+        compile files(javaFxJar)
+        compile files(antJavaFxJar)
+    }
+
+    jar {
+        // Reset actions, replacing them with those below
+        actions = []
+        doLast {
+            def uri = 'javafx:com.sun.javafx.tools.ant'
+            ant.taskdef(
+                    resource: 'com/sun/javafx/tools/ant/antlib.xml',
+                    uri: uri, classpath: antJavaFxJar)
+            def javafx = NamespaceBuilder.newInstance(ant, uri)
+            javafx.application(id: 'appInfo', name: name,
+                    mainClass: applicationClassName)
+            javafx.jar(destfile: "${buildDir}/libs/${project.name}-${version}.jar") {
+                javafx.application(refid: 'appInfo')
+                fileset(dir: "${buildDir}/classes/main")
+                fileset(dir: "${buildDir}/resources/main", erroronmissingdir: false)
+            }
+        }
+    }
+
+    run {
+        jvmArgs javaOpts
+        main = applicationClassName
+    }
+
+    startScripts {
+        doLast {
+            def script = new File(getOutputDir(), applicationName)
+            String content = script.text
+            script.text = content.replaceFirst(
+                'DEFAULT_JVM_OPTS=""',
+                "DEFAULT_JVM_OPTS=\"${javaOpts.join(' ')}\"")
+        }
+    }
+
+    // Ensure that the build environment JVM's jfxrt.jar does not end up in the
+    // application distribution.
+    applicationDistribution.exclude '**/*jfxrt.jar'
+}

@@ -1,0 +1,2 @@
+include 'javafx'
+project(':javafx').name = 'big-image-viewer-javafx'
