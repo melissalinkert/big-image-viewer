@@ -46,8 +46,8 @@ subprojects {
 project (':big-image-viewer-javafx') {
     apply plugin: 'application'
 
-    mainClassName = 'org.openmicroscopy.viewer.ImageViewer'
-    def applicationClassName = 'org.openmicroscopy.viewer.ImageViewer'
+    mainClassName = 'viewer.ImageViewer'
+    def applicationClassName = 'viewer.ImageViewer'
     def javaOpts = [
         '-Dlogback.configurationFile=logback-big-image-viewer-javafx.xml',
     ]

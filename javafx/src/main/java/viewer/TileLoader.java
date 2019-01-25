@@ -1,4 +1,4 @@
-package org.openmicroscopy.viewer;
+package viewer;
 
 import java.io.IOException;
 import loci.formats.FormatException;

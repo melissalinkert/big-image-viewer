@@ -1,4 +1,4 @@
-package org.openmicroscopy.viewer;
+package viewer;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
