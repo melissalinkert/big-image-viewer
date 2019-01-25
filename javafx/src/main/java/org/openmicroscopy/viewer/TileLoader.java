@@ -18,6 +18,7 @@ public class TileLoader {
     reader = new BufferedImageReader();
     try {
       reader.setId(filename);
+      reader.setSeries(0);
       sizeX = reader.getSizeX();
       sizeY = reader.getSizeY();
     }
@@ -34,7 +35,7 @@ public class TileLoader {
   public void adjustX(int xIncrement) {
     int newX = x + xIncrement;
     if (newX >= 0 && newX + tileX <= sizeX) {
-      x = newX; 
+      x = newX;
     }
   }
 

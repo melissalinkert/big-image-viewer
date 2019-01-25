@@ -4,11 +4,12 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 public class ImageViewer extends Application {
@@ -26,11 +27,23 @@ public class ImageViewer extends Application {
   public void start(Stage primaryStage) {
     initializeTileLoader(getParameters().getRaw().get(0));
 
+    Label pixelsLabel = new Label("Pixels to move on arrow key press");
     TextField pixelsToMove = new TextField("100");
-    pixelsToMove.setPromptText("Pixels to move on arrow key press");
 
     ImageView viewport = new ImageView(tileLoader.loadTile());
-    viewport.setOnKeyReleased(new EventHandler<KeyEvent>() {
+
+    AnchorPane root = new AnchorPane();
+    AnchorPane.setTopAnchor(pixelsLabel, 10.0);
+    AnchorPane.setLeftAnchor(pixelsLabel, 100.0);
+    AnchorPane.setTopAnchor(pixelsToMove, 10.0);
+    AnchorPane.setRightAnchor(pixelsToMove, 100.0);
+    AnchorPane.setBottomAnchor(viewport, 10.0);
+    AnchorPane.setLeftAnchor(viewport, 10.0);
+    AnchorPane.setRightAnchor(viewport, 10.0);
+    root.getChildren().addAll(pixelsLabel, pixelsToMove, viewport);
+
+    Scene scene = new Scene(root, DISPLAY_WIDTH, DISPLAY_HEIGHT + 100);
+    scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent event) {
         if (event.getEventType().equals(KeyEvent.KEY_RELEASED)) {
@@ -52,12 +65,6 @@ public class ImageViewer extends Application {
         viewport.setImage(tileLoader.loadTile());
       }
     });
-
-    StackPane root = new StackPane();
-    root.getChildren().add(pixelsToMove);
-    root.getChildren().add(viewport);
-
-    Scene scene = new Scene(root, DISPLAY_WIDTH, DISPLAY_HEIGHT + 100);
 
     primaryStage.setTitle("Big Image Viewer");
     primaryStage.setScene(scene);
