@@ -1,10 +1,12 @@
 package org.openmicroscopy.viewer;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -37,6 +39,14 @@ public class ImageViewer extends Application {
 
     Label pixelsLabel = new Label("Pixels to move on arrow key press");
     TextField pixelsToMove = new TextField("100");
+
+    Label currentPosX = new Label("Upper left corner X:");
+    Label currentPosY = new Label("Upper left corner Y:");
+    TextField posX = new TextField("0");
+    TextField posY = new TextField("0");
+
+    Button updatePosition = new Button("Update position");
+
     Label pixelLocation = new Label("X: Y:");
 
     ImageView viewport = new ImageView(tileLoader.loadTile());
@@ -46,6 +56,20 @@ public class ImageViewer extends Application {
         pixelLocation.setText(String.format("X: %d Y: %d",
           (int) event.getX() + tileLoader.getX(),
           (int) event.getY() + tileLoader.getY()));
+      }
+    });
+
+    updatePosition.setOnAction(new EventHandler<ActionEvent>() {
+      @Override
+      public void handle(ActionEvent event) {
+        try {
+          int x = Integer.parseInt(posX.getText());
+          int y = Integer.parseInt(posY.getText());
+          tileLoader.setX(x);
+          tileLoader.setY(y);
+          viewport.setImage(tileLoader.loadTile());
+        }
+        catch (NumberFormatException e) { }
       }
     });
 
@@ -63,8 +87,13 @@ public class ImageViewer extends Application {
 
     root.add(pixelsLabel, 0, 0, 1, 1);
     root.add(pixelsToMove, 1, 0, 1, 1);
-    root.add(pixelLocation, 0, 1, 2, 1);
-    root.add(viewportPane, 0, 2, 2, 1);
+    root.add(currentPosX, 0, 1, 1, 1);
+    root.add(posX, 1, 1, 1, 1);
+    root.add(currentPosY, 0, 2, 1, 1);
+    root.add(posY, 1, 2, 1, 1);
+    root.add(updatePosition, 0, 3, 2, 1);
+    root.add(pixelLocation, 0, 4, 2, 1);
+    root.add(viewportPane, 0, 5, 2, 1);
 
     Scene scene = new Scene(root, DISPLAY_WIDTH, DISPLAY_HEIGHT + 100);
     scene.setOnKeyReleased(new EventHandler<KeyEvent>() {
@@ -93,8 +122,13 @@ public class ImageViewer extends Application {
           else if (code == KeyCode.DOWN) {
             tileLoader.adjustY(pix);
           }
+          else {
+            return;
+          }
+          posX.setText(String.valueOf(tileLoader.getX()));
+          posY.setText(String.valueOf(tileLoader.getY()));
+          viewport.setImage(tileLoader.loadTile());
         }
-        viewport.setImage(tileLoader.loadTile());
       }
     });
 

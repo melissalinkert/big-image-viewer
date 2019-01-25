@@ -33,17 +33,11 @@ public class TileLoader {
   }
 
   public void adjustX(int xIncrement) {
-    int newX = x + xIncrement;
-    if (newX >= 0 && newX + tileX <= sizeX) {
-      x = newX;
-    }
+    setX(x + xIncrement);
   }
 
   public void adjustY(int yIncrement) {
-    int newY = y + yIncrement;
-    if (newY >= 0 && newY + tileY <= sizeY) {
-      y = newY;
-    }
+    setY(y + yIncrement);
   }
 
   public Image loadTile() {
@@ -52,6 +46,18 @@ public class TileLoader {
     }
     catch (FormatException | IOException e) {
       return null;
+    }
+  }
+
+  public void setX(int newX) {
+    if (newX >= 0 && newX + tileX <= sizeX) {
+      x = newX;
+    }
+  }
+
+  public void setY(int newY) {
+    if (newY >= 0 && newY + tileY <= sizeY) {
+      y = newY;
     }
   }
 
