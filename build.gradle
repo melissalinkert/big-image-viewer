@@ -3,7 +3,7 @@ def javaFxJar = "${javaHome}/lib/jfxrt.jar"
 def antJavaFxJar = "${javaHome}/../lib/ant-javafx.jar"
 
 allprojects {
-    version '0.1'
+    version '0.1-SNAPSHOT'
     if (System.env.BUILD_NUMBER) {
         version "${version}-b${System.env.BUILD_NUMBER}"
     }
