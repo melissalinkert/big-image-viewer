@@ -30,9 +30,6 @@ subprojects {
         maven {
             url 'https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases/'
         }
-        maven {
-            url 'https://artifacts.glencoesoftware.com/artifactory/libs-local/'
-        }
     }
 
     dependencies {
